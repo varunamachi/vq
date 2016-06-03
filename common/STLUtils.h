@@ -8,12 +8,23 @@
 
 namespace Vq { namespace STLUtils {
 
-template< typename ContainerType >
-struct IsSTDContainer
+template< typename... Ts >
+struct EvalHelper
 {
-    template< typename U > static constexpr
-    decltype( std::declval< U::const_iterator >(), bool() )
-        test( int /*unused*/ )
+    using type = void;
+};
+
+
+template< typename ContainerType >
+struct IsStdContainer
+{
+    template< typename U,
+              typename  = typename EvalHelper<
+                  typename U::value_type,
+                  typename U::iterator,
+                  decltype( std::declval< U >().begin() ),
+                  decltype( std::declval< U >().end() ) >::type >
+    static constexpr bool test( int /*unused*/ )
     {
         return true;
     }
@@ -25,17 +36,20 @@ struct IsSTDContainer
 
     static constexpr bool value = test< ContainerType >( int() );
 };
+
 
 template< typename ContainerType >
 struct IsAssociativeContainer
 {
-    template< typename U > static constexpr
-    decltype( std::declval< U::key_type >(),
-              std::declval< U::value_type >(),
-              bool() )
-        test( int /*unused*/ )
+    template< typename U,
+              typename = typename EvalHelper <
+                  typename U::key_type,
+                  typename U::value_type,
+                  decltype( std::declval< U >().find(
+                    std::declval< U::key_type >())) >::type >
+    static constexpr bool test( int /*unused*/ )
     {
-        return true;
+        return IsStdContainer< U >::value;
     }
 
     template< typename U > static constexpr bool test( ... )
@@ -43,24 +57,42 @@ struct IsAssociativeContainer
         return false;
     }
 
-    static constexpr bool value = test< ContainerType >( int() );
+    static constexpr bool value = test< ContainerType >( int () );
+};
+
+
+template< typename ContainerType >
+struct IsSequentialContainer
+{
+    static constexpr bool value = IsStdContainer< ContainerType >::value
+            && ( ! IsAssociativeContainer< ContainerType >::value );
+
 };
 
 
 template< typename ContainerType,
-          typename = typename std::enable_if
-          <(
-              ! IsAssociativeContainer< ContainerType >::value
-              && IsSTDContainer< ContainerType >::value
-          )>::type
-        >
-struct IsSequentialContainer : public std::true_type
+          typename = typename std::enable_if<
+              IsAssociativeContainer< ContainerType >::value >::type >
+bool contains( const ContainerType &container,
+               const typename ContainerType::key_type &key )
 {
+    auto it = container.find( key );
+    return it != std::end( container );
+}
 
-};
 
-
-
+template< typename ContainerType,
+          typename = typename std::enable_if<
+              IsSequentialContainer< ContainerType >::value >::type >
+bool contains( const ContainerType &container,
+               const typename ContainerType::value_type &elem )
+{
+    auto it = std::find( std::begin( container ),
+                         std::end( container ),
+                         elem );
+    bool result = it != std::end( container );
+    return result;
+}
 
 
 template< typename ContainerType >
@@ -76,17 +108,7 @@ void eraseIf(
 }
 
 
-template< typename ContainerType >
-bool contains( const ContainerType &container,
-               const typename ContainerType::key_type &key )
-{
-    auto it = container.find( key );
-    return it != std::end( container );
-}
 
-//template< typename ContainerType,
-//          std::enable_if< >
-//          bool contains( const ContainerType &container )
 
 
 template< typename ContainerType >
