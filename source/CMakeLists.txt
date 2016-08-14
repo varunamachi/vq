@@ -1,11 +1,9 @@
 project( vqcore )
 cmake_minimum_required(VERSION 3.1)
 cmake_policy( SET CMP0020 NEW )
-include( $ENV{QUARTZ_ROOT}/cmake/quartz.cmake )
+include( $ENV{VQ_ROOT}/cmake/vq.cmake )
 
 add_definitions( -DVQ_CORE )
-
-vq_add_qt()
 
 vq_headers(
     Vq.h
