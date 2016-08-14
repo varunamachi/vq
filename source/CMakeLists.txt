@@ -1,4 +1,4 @@
-project( vqcore )
+project( vq )
 cmake_minimum_required(VERSION 3.1)
 cmake_policy( SET CMP0020 NEW )
 include( $ENV{VQ_ROOT}/cmake/vq.cmake )

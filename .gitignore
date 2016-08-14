@@ -45,3 +45,5 @@ Makefile*
 CMakeLists.txt.user
 
 /.vscode
+
+logfile.txt
