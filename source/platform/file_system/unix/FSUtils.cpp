@@ -205,34 +205,7 @@ Result< bool > FSUtils::mkdirImpl( const std::string &path )
     return result;
 }
 
-Result< bool > FSUtils::createDirecties( const std::string &path )
-{
-    auto pathRes = Path::create(path);
-    if( ! pathRes.value() ) {
-        auto err = R::failure( false, std::move( pathRes ));
-        VQ_ERROR( "Vq:Core:FS" ) << err;
-        return err;
-    }
-    auto result = R::success( true );
-    const auto &comps = pathRes.data().components();
-    Path cur{ std::vector< std::string >{}, pathRes.data().isAbsolute() };
-    for( const auto &dir : comps ) {
-        cur.append( dir );
-        File fl{ cur };
-        if( fl.exists() && fl.type() == File::Type::Dir ) {
-            //no need to create
-            continue;
-        }
-        else if( ! fl.exists() ) {
-            //create a directory
 
-        }
-        else {
-            //Give error, file exists but is not a directory
-        }
-    }
-    return result;
-}
 
 
 
