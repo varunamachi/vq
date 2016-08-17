@@ -319,11 +319,13 @@ Result< bool > FSUtils::copyDirImpl(
         }
         if( result.value() && deleteSource ) {
             for( const auto &file : fileList ) {
+//                if( ! skipped.containns( file.path() ))
                 auto delRes = deleteFile( file );
                 if( ! delRes.value() ) {
                     VQ_WARN( "Vq:Core:FS" )
                             << "Dir Move: Failed to delete file at " << file;
                 }
+//              }
                 if( progCallback != nullptr &&
                         ! progCallback( complete,
                                         numCompleted,
@@ -422,6 +424,46 @@ Result< bool > FSUtils::moveDirectory( const std::string &srcStrPath,
     }
     if( resultCallback != nullptr ) {
         resultCallback( result );
+    }
+    return result;
+}
+
+
+Result< bool > FSUtils::createDirecties( const std::string &path )
+{
+    auto pathRes = Path::create(path);
+    if( ! pathRes.value() ) {
+        auto err = R::failure( false, std::move( pathRes ));
+        VQ_ERROR( "Vq:Core:FS" ) << err;
+        return err;
+    }
+    auto result = R::success( true );
+    const auto &comps = pathRes.data().components();
+    Path cur{ std::vector< std::string >{}, pathRes.data().isAbsolute() };
+    for( const auto &dir : comps ) {
+        cur.append( dir );
+        File fl{ cur };
+        if( fl.exists() && fl.type() == File::Type::Dir ) {
+            //no need to create
+            continue;
+        }
+        else if( ! fl.exists() ) {
+            result = mkdirImpl( cur.toString() );
+            if( ! result.value() ) {
+                VQ_ERROR( "Vq:Core:FS" )
+                        << "Make Dirs: Could not create a directory in the "
+                           "given path, exiting...";
+                break;
+            }
+        }
+        else {
+            result = R::stream( false )
+                    << "Could not create directory at " << cur << " - "
+                    << "a file (which is not a directory itslef) exists at that"
+                       " path" << R::fail;
+            VQ_ERROR( "Vq:Core:FS" ) << result;
+            break;
+        }
     }
     return result;
 }

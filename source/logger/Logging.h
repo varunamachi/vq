@@ -33,6 +33,15 @@ public:
         return *this;
     }
 
+    template< typename T >
+    LogLineHolder & operator<<( T &&obj )
+    {
+        if( m_msg->logLevel() >= m_level ) {
+            m_stream << obj;
+        }
+        return *this;
+    }
+
     LogLineHolder& operator << ( Manip &manip )
     {
         if( m_msg->logLevel() >= m_level ) {

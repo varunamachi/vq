@@ -1,7 +1,8 @@
 
 
-#include <QReadWriteLock>
+#include <mutex>
 
+#include "../common/Threading.h"
 #include "JobContext.h"
 
 
@@ -20,13 +21,13 @@ public:
 
     inline bool cancelRequested() const
     {
-        m_lock.lockForRead();
+        std::lock_guard< std::mutex > guard( m_lock );
         return m_cancelRequested;
     }
 
     inline void requestCancel()
     {
-        m_lock.lockForWrite();
+        VQ_LOCK( m_lock );
         m_cancelRequested = true;
     }
 
@@ -40,7 +41,7 @@ private:
 
     bool m_cancelRequested;
 
-    mutable QReadWriteLock m_lock;
+    mutable std::mutex m_lock;
 };
 
 

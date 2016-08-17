@@ -23,8 +23,6 @@
 #pragma once
 
 #include <string>
-#include <QDateTime>
-#include <QtGlobal>
 
 
 namespace Vq { namespace Logger {

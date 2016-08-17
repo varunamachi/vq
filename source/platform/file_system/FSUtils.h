@@ -97,8 +97,9 @@ private:
             const File &dstDir,
             bool deleteSource,
             ConflictStrategy onConflict,
-            DirCopyProgFunc progCallback,
-            VQ_OUT std::unordered_set< std::string > &skipped );
+            DirCopyProgFunc progCallback );
+
+    static Result< bool > mkdirImpl( const std::string &path );
 
 
 };
