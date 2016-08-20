@@ -64,7 +64,7 @@ private:
 Result< bool > PluginManager::Impl::loadAll()
 {
     Result< bool > result;
-    m_libraries = m_loader.loadAll( m_location ).data();
+    m_libraries = std::move( m_loader.loadAll( m_location ).data() );
     std::unordered_set< std::string > loadedBundles;
     std::size_t processed = 0;
     for( auto &bpair : m_libraries ) {

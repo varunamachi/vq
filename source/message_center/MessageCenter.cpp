@@ -39,13 +39,12 @@ public:
     inline void removeSubscriber( IMessageClient *client )
     {
         if( client != nullptr ) {
-            using ValType = decltype( m_subscribers )::value_type;
             VQ_LOCK( m_mutex );
             STLUtils::eraseIf(
                         m_subscribers,
-                        [ &client ]( const ValType &item) -> bool
+                        [ &client ]( const IMessageClient *item) -> bool
             {
-                return client == item.second;
+                return client == item;
             });
         }
         else {
@@ -56,13 +55,12 @@ public:
 
     inline void removeSubscriber( const std::string &clientId )
     {
-        using ValType = decltype( m_subscribers )::value_type;
         VQ_LOCK( m_mutex );
         STLUtils::eraseIf(
                     m_subscribers,
-                    [ &clientId ]( const ValType &item) -> bool
+                    [ &clientId ]( const IMessageClient *client ) -> bool
         {
-            return clientId == item.second->messageClientId();
+            return clientId == client->messageClientId();
         });
 
     }

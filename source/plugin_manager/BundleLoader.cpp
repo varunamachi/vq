@@ -41,7 +41,7 @@ Result< BundleMap > BundleLoader::loadAll( const std::string &location )
         auto libRes = loadFile( file.path().toString() );
         if( libRes.value() ) {
             bundleMap.emplace( libRes.data()->bundle()->bundleId(),
-                               libRes.data() );
+                               std::move( libRes.data() ));
         }
     }
     return R::success( std::move( bundleMap ));
@@ -51,7 +51,9 @@ Result< BundleMap > BundleLoader::loadAll( const std::string &location )
 Result< BundleLibraryPtrUq > BundleLoader::loadFile(
         const std::string &filePath )
 {
-    auto result = R::failure( BundleLibraryPtrUq{ nullptr }, "Unknown error" );
+    auto result = R::failure< BundleLibraryPtrUq >(
+                BundleLibraryPtrUq{ nullptr },
+                "Unknown error" );
     auto lib = std::make_unique< SharedLibrary >( filePath );
     auto ldRes = lib->load();
     if( ldRes ) {

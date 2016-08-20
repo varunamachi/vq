@@ -51,7 +51,7 @@ Result< bool > JobSequence::execute( const JobContext &context )
         result = jobFunc( context );
     }
     else {
-        result = R::failure< bool >( false, "Invalid job found" );
+        result = R::failure( false, "Invalid job found" );
     }
     return result;
 }

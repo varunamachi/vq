@@ -229,13 +229,24 @@ struct R {
 
 
     template< typename ReturnType >
-    static Result< ReturnType > failure( ReturnType data,
+    static Result< ReturnType > failure( const ReturnType &data,
                                          std::string &&reason,
                                          ErrorCodeType errorCode = 0 )
     {
         return Result< ReturnType >( false,
                                      data,
-                                     std::forward< std::string >( reason ),
+                                     std::move( reason ),
+                                     errorCode );
+    }
+
+    template< typename ReturnType >
+    static Result< ReturnType > failure( ReturnType &&data,
+                                         std::string &&reason,
+                                         ErrorCodeType errorCode = 0 )
+    {
+        return Result< ReturnType >( false,
+                                     std::move( data ),
+                                     std::move( reason ),
                                      errorCode );
     }
 
@@ -285,7 +296,7 @@ public:
     }
 
     RStream( ReturnType &&data, ErrorCodeType errorCode = 0 )
-        : m_data( data )
+        : m_data( std::move( data ))
         , m_errorCode( errorCode )
     {
 

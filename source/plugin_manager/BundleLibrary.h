@@ -23,6 +23,8 @@ public:
 
     bool isValid() const;
 
+    ~BundleLibrary();
+
 private:
     class Impl;
     std::unique_ptr< Impl > m_impl;

@@ -51,6 +51,10 @@ private:
     bool m_isValid;
 };
 
+BundleLibrary::~BundleLibrary()
+{
+
+}
 
 BundleLibrary::BundleLibrary()
     : m_impl( std::make_unique< BundleLibrary::Impl >() )

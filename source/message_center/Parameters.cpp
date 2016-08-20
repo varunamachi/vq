@@ -32,7 +32,7 @@ Parameters::Parameters( std::map< std::string, std::string > &params )
 
 void Parameters::addParam( const std::string &key, const std::string &value )
 {
-    m_data->paramMap().insert( key, value );
+    m_data->paramMap().emplace( key, value );
 }
 
 

@@ -13,7 +13,7 @@ namespace Vq {
 class Path::Data
 {
 public:
-    Data( const Path &container )
+    Data( const Path *container )
         : m_components()
         , m_absolute( false )
         , m_str( "" )
@@ -22,16 +22,18 @@ public:
 
     }
 
-    Data( const std::vector< std::string > &components,
+    Data( const Path *container,
+          const std::vector< std::string > &components,
           bool absolute )
         : m_components( components )
         , m_absolute( absolute )
         , m_str( "" )
+        , m_container( container )
     {
 
     }
 
-    Data( const Path &container,
+    Data( const Path *container,
           const std::vector< std::string > &&components,
           bool absolute )
         : m_components( components )
@@ -84,14 +86,14 @@ public:
     std::vector< std::string > & components()
     {
         return m_components;
-        m_str = m_container.collapse();
+        m_str = m_container->collapse();
     }
 
     void assign( std::vector< std::string > &&comp, bool isAbs )
     {
         m_components = comp;
         m_absolute = isAbs;
-        m_str = m_container.collapse();
+        m_str = m_container->collapse();
     }
 
     const std::string & toString() const
@@ -111,25 +113,25 @@ private:
 
     std::string m_str;
 
-    const Path &m_container;
+    const Path *m_container;
 };
 
 
 Path::Path()
-    : m_data( std::make_unique< Data >() )
+    : m_data( std::make_unique< Data >( this ) )
 {
 
 }
 
 
 Path::Path( const std::vector< std::string > &components, bool absolute )
-    : m_data( std::make_unique< Path::Data >( components, absolute ))
+    : m_data( std::make_unique< Path::Data >( components, absolute, this ))
 {
 }
 
 
 Path::Path( const std::vector< std::string > &&components, bool absolute )
-    : m_data( std::make_unique< Path::Data >( components, absolute ))
+    : m_data( std::make_unique< Path::Data >( components, absolute, this ))
 {
 }
 
@@ -244,7 +246,7 @@ Path & Path::append( const std::string &relative )
         return *this;
     }
     auto result = parse( relative );
-    if( result ) {
+    if( result.value() ) {
         for( auto &cmp : result.data() ) {
             m_data->components().emplace_back( std::move( cmp ));
         }
@@ -279,7 +281,7 @@ Result< Path > Path::pathOfChild( const std::string &relative ) const
 {
     auto compRes = parse( relative );
     auto result = R::success< Path >( Path{} );
-    if( compRes ) {
+    if( compRes.value() ) {
         auto newComps = this->components();
         for( auto &cmp : compRes.data() ) {
             newComps.emplace_back( std::move( cmp ));

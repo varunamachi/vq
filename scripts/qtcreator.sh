@@ -3,7 +3,9 @@
 exec &> logfile.txt
 
 #VQ_ROOT=/mnt/Store/Kode/github/quartz/
-VQ_ROOT=`readlink -f ..`
+
+SCRIPT_DIR=$(dirname "$0")
+VQ_ROOT=`readlink -f $SCRIPT_DIR/..`
 echo "Using root $VQ_ROOT"
 export VQ_ROOT
 if [[ -e ~/bin/qtcreator ]] 

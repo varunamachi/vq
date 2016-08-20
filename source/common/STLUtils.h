@@ -93,9 +93,11 @@ bool contains( const ContainerType &container,
 }
 
 
-template< typename ContainerType >
+template< typename ContainerType,
+          typename = typename std::enable_if<
+              IsSequentialContainer< ContainerType >::value >::type >
 void eraseIf(
-        ContainerType container,
+        ContainerType &container,
         std::function< bool(
             const typename ContainerType::value_type & )> condition )
 {
@@ -104,6 +106,24 @@ void eraseIf(
                               condition );
     container.erase( it, std::end( container ));
 }
+
+
+template< typename ContainerType,
+          typename = typename std::enable_if<
+              IsAssociativeContainer< ContainerType >::value >::type >
+void eraseIf(
+        ContainerType &container,
+        std::function< bool(
+            const typename ContainerType::mapped_type & )> condition )
+{
+    for( auto it = std::begin( container ); it != std::end( container );  ) {
+        auto eit = it ++;
+        if( condition( eit->second )) {
+            container.erase( eit );
+        }
+    }
+}
+
 
 
 template< typename ContainerType,

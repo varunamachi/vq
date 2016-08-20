@@ -28,7 +28,9 @@ public:
     RetType call( Ts... args )
     {
         if( m_funcPtr != nullptr ) {
-            return get< RetType( Ts... )>()( args... );
+//            return get< RetType * ( Ts... )>()( args... );
+            typedef RetType ( *F )( Ts... );
+            return get< F >()( args...);
         }
         return RetType{ };
     }
