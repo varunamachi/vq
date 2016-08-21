@@ -9,5 +9,5 @@ vq_classes(
 )
 
 vq_headers(
-    PluginBundleInterface
+    PluginBundleInterface.h
 )
