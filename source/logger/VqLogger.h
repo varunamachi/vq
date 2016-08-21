@@ -22,7 +22,6 @@ enum class VqLogLevel : int;
 class VQ_API VqLogger final
 {
 public:
-
     void setDispatcher( std::unique_ptr< AbstractLogDispatcher > &&dispatcher );
 
     AbstractLogDispatcher * dispatcher() const;

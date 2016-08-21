@@ -78,6 +78,11 @@ public:
         return *this;
     }
 
+    bool isAbsolute() const
+    {
+        return m_absolute;
+    }
+
     const std::vector< std::string > & components() const
     {
         return m_components;
@@ -227,6 +232,13 @@ std::string Path::baseName() const
     }
     return name;
 }
+
+
+bool Path::isAbsolute() const
+{
+    return m_data->isAbsolute();
+}
+
 
 const std::vector< std::string > & Path::components() const
 {

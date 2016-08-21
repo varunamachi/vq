@@ -1,6 +1,6 @@
 /.project
 *.txt.user*
-builds/*
+build/*
 output/lib/*
 output/include/*
 output/bin/*

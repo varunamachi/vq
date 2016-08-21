@@ -22,6 +22,12 @@ public:
     {
     }
 
+    explicit Data( const Path &path )
+        : m_path( path.toString() )
+        , m_pathObj( path )
+    {
+    }
+
     Data( Data &&other )
         : m_path( std::move( other.m_path ))
         , m_pathObj( std::move( other.m_pathObj ))

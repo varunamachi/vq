@@ -114,6 +114,56 @@ void VqLogger::Impl::log( LogMessage *msg )
 std::unique_ptr< VqLogger > VqLogger::s_instance = nullptr;
 
 
+
+void VqLogger::setDispatcher( std::unique_ptr< AbstractLogDispatcher > &&dispatcher )
+{
+    m_impl->setDispatcher( std::move( dispatcher ));
+}
+
+
+AbstractLogDispatcher * VqLogger::dispatcher() const
+{
+    return m_impl->dispatcher();
+}
+
+
+VqLogLevel VqLogger::filterLevel() const
+{
+    return m_impl->filterLevel();
+}
+
+
+void VqLogger::setFilterLevel( VqLogLevel level )
+{
+    m_impl->setFilterLevel( level );
+}
+
+
+bool VqLogger::isMethodLoggingEnabled() const
+{
+    return m_impl->isMethodLoggingEnabled();
+}
+
+void VqLogger::setMethodLogState( bool value )
+{
+    m_impl->setMethodLogState( value );
+}
+
+
+
+bool VqLogger::isEnabled() const
+{
+    return m_impl->isEnabled();
+}
+
+
+void VqLogger::setEnabled( bool val )
+{
+    m_impl->setEnabled( val );
+}
+
+
+
 bool VqLogger::init( std::unique_ptr < AbstractLogDispatcher > &&dispatcher,
                      VqLogLevel level )
 {

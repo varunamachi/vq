@@ -12,14 +12,14 @@ const std::string Path::SEPERATOR( "\\" );
 Result< Path > Path::create( const std::string &strPath )
 {
     auto compRes = parse( strPath );
-    if( compRes ) {
+    if( compRes.value() ) {
         auto absolute = false;
         if( StringUtils::isAsciiChar( strPath[ 0 ]) && strPath[ 1 ] == ':' ) {
             absolute = true;
         }
         return R::success( Path{ std::move( compRes.data() ), absolute });
     }
-    return R::failure( Path{}, compRes.reason() );
+    return R::failure( Path{}, std::move( compRes ));
 }
 
 
