@@ -27,9 +27,10 @@ public:
 
     VQ_MAKE_STATIC( FSUtils );
 
-    using FilterFunction = std::function< bool( const File & )>;
     using FileList = std::vector< Vq::File >;
-    using BoolResultFunc = std::function< void( Result< bool > )>;
+    using FileListResultFunc = std::function< void( const Result< FileList >&)>;
+    using FilterFunction = std::function< bool( const File & )>;
+    using BoolResultFunc = std::function< void( const Result< bool > & )>;
     using DirCopyProgFunc = std::function< bool( std::size_t,
                                                   std::size_t,
                                                   const File &,
@@ -51,7 +52,7 @@ public:
     static Result< FileList > listFiles(
             const File &dir,
             FilterFunction filter = nullptr,
-            std::function< void( Result< FileList >)> resultCallback = nullptr);
+            FileListResultFunc resultCallback = nullptr);
 
     static Result< bool > copyFile( const std::string &srcPath,
                                     const std::string &dstPath,

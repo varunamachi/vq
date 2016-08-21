@@ -14,9 +14,7 @@ Result< File > FSUtils::fileAt( const std::string &path )
     if( ! resPath.value() ) {
         return R::failure< File >( File{ }, std::move( resPath ));
     }
-    File file{ resPath.data() };
-    return R::success< File >( file );
-
+    return R::success< File >( File{ resPath.data() } );
 }
 
 
@@ -119,7 +117,7 @@ Result< bool > FSUtils::copyFile( const std::string &psrc,
                                   const std::string &pdst,
                                   const bool forceCopy,
                                   FSUtils::BoolResultFunc resultCallback,
-                                  ProgressFunction progCallback)
+                                  ProgressFunction progCallback )
 {
     auto srcRes = Path::create( psrc );
     auto dstRes = Path::create( pdst );

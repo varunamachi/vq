@@ -10,14 +10,14 @@ const std::string Path::SEPERATOR( "/" );
 Result< Path > Path::create( const std::string &strPath )
 {
     auto compRes = parse( strPath );
-    if( compRes ) {
+    if( compRes.value() ) {
         auto absolute = false;
         if( strPath[ 0 ] == '/' || strPath[ 0 ] == '\\' ) {
             absolute = true;
         }
         return R::success( Path{ std::move( compRes.data() ), absolute });
     }
-    return R::failure( Path{}, compRes.reason() );
+    return R::failure< Path >( Path{}, std::move( compRes ));
 }
 
 

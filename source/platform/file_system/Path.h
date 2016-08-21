@@ -61,7 +61,7 @@ public:
 
     Path parent() const;
 
-    Result< Path & > mergeWith( const Path &other );
+    Result< Path > mergeWith( const Path &other );
 
     Result< Path > relativeTo( const Path & other ) const;
 

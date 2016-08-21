@@ -125,13 +125,13 @@ Path::Path()
 
 
 Path::Path( const std::vector< std::string > &components, bool absolute )
-    : m_data( std::make_unique< Path::Data >( components, absolute, this ))
+    : m_data( std::make_unique< Path::Data >( this, components, absolute ))
 {
 }
 
 
 Path::Path( const std::vector< std::string > &&components, bool absolute )
-    : m_data( std::make_unique< Path::Data >( components, absolute, this ))
+    : m_data( std::make_unique< Path::Data >( this, components, absolute ))
 {
 }
 
@@ -324,7 +324,7 @@ void Path::assign( std::vector< std::string > && comp, bool isAbs )
 }
 
 
-Result< Path & > Path::mergeWith( const Path &other )
+Result< Path > Path::mergeWith( const Path &other )
 {
     using CmpVec = std::vector< std::string >;
     auto matchMove = []( CmpVec main, CmpVec other ) -> CmpVec::iterator
@@ -345,14 +345,14 @@ Result< Path & > Path::mergeWith( const Path &other )
         return oit;
     };
 
-    auto res = R::success< Path & >( *this );
+    auto res = R::success< Path >( *this );
     if( this->isAbsolute() && other.isAbsolute() ) {
         auto &main = STLUtils::largestOf( components(), other.components() );
         auto &slv = STLUtils::smallestOf( components(), other.components() );
         auto mit = std::begin( main );
         for( auto sit = std::begin( slv ); sit != std::end( slv ); ++ sit ) {
             if( *sit != *mit ) {
-                res = R::stream< Path & >( *this )
+                res = R::stream< Path >( *this )
                         << "Failed to merge path, size given paths are absolute"
                            "and are different withing the merge range"
                         << R::fail;

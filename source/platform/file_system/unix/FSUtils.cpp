@@ -75,7 +75,7 @@ static Result< bool > list( const File &dir,
             auto newPath = path.pathOfChild( dirPtr->d_name ).data();
             File newFile{ newPath };
             if( newFile.type() == File::Type::Dir ) {
-                filesOut.emplace_back( newFile );
+                filesOut.emplace_back( std::move( newFile ));
                 auto res = list( newFile, filter, filesOut );
                 if( ! res ) {
                     //Or we could return
@@ -101,13 +101,13 @@ static Result< bool > list( const File &dir,
 Result< FSUtils::FileList > FSUtils::listFiles(
         const File &dir,
         FSUtils::FilterFunction filter,
-        std::function< void( Result< FileList >)> resultCallback )
+        FileListResultFunc resultCallback )
 {
     FileList files;
     auto rz = list( dir, filter, files );
-    auto result = R::success< FileList >( files );
+    auto result = R::success< FileList >( std::move( files ));
     if( ! rz ) {
-        result = R::failure< FileList >( files, std::move( rz ));
+        result = R::failure< FileList >( FileList{ }, std::move( rz ));
     }
     resultCallback( result );
     return result;
@@ -212,7 +212,7 @@ Result< bool > FSUtils::mkdirImpl( const std::string &path )
 Result< bool > FSUtils::createSoftLink( const std::string &targetPath,
                                         const std::string &linkPath )
 {
-    return R::failure( false );
+    return R::failure< bool >();
 }
 
 
@@ -220,7 +220,7 @@ Result< bool > FSUtils::createSoftLink( const std::string &targetPath,
 Result< bool > FSUtils::deleteDir( const std::string &path,
                                    const bool force )
 {
-    return R::failure( false );
+    return R::failure< bool >();
 }
 
 

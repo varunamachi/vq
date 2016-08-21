@@ -38,7 +38,7 @@ public:
         : m_result( other.value() )
         , m_data( other.data() )
         , m_reason( other.reason() )
-        , m_errorCode( other.erroCode() )
+        , m_errorCode( other.errorCode() )
     {
 
     }
@@ -165,6 +165,11 @@ public:
         return m_reason;
     }
 
+    std::string & reason()
+    {
+        return m_reason;
+    }
+
     ReturnType & data()
     {
         return m_data;
@@ -204,6 +209,7 @@ template< typename ReturnType > class RStream;
 struct R {
     VQ_MAKE_STATIC( R );
 
+//################# Success
     template< typename ReturnType >
     static Result< ReturnType > success( const ReturnType &data )
     {
@@ -216,15 +222,15 @@ struct R {
         return Result< ReturnType >( true, std::move( data ), "",  0 );
     }
 
+
+//################# Failure
     template< typename ReturnType >
-    static Result< ReturnType > failure( ReturnType data = ReturnType{ },
-                                         const std::string &reason = "",
-                                         ErrorCodeType errorCode = 0 )
+    static Result< ReturnType > failure()
     {
         return Result< ReturnType >( false,
-                                     data,
-                                     std::move( reason ),
-                                     errorCode );
+                                     ReturnType{},
+                                     "",
+                                     0 );
     }
 
 
@@ -250,8 +256,10 @@ struct R {
                                      errorCode );
     }
 
+
+//################# Forward
     template< typename ReturnType, typename CauseReturnType >
-    static Result< ReturnType > failure( ReturnType data,
+    static Result< ReturnType > failure( ReturnType &data,
                                          Result< CauseReturnType > &&cause )
     {
         return R::failure< ReturnType >( data,
@@ -259,7 +267,17 @@ struct R {
                                          cause.errorCode() );
     }
 
+    template< typename ReturnType, typename CauseReturnType >
+    static Result< ReturnType > failure( ReturnType &&data,
+                                         Result< CauseReturnType > &&cause )
+    {
+        return R::failure< ReturnType >( std::move( data ),
+                                         std::move( cause.reason() ),
+                                         cause.errorCode() );
+    }
 
+
+//################# Stream
     template< typename ReturnType >
     static RStream< ReturnType > stream( ReturnType r,
                                          ErrorCodeType errorCode = 0 )
