@@ -255,7 +255,9 @@ Result< bool > FSUtils::copyDirImpl(
     const auto &srcPath = srcDir.path();
     const auto &dstPath = dstDir.path();
     //Ready to Copy!!
-    auto flistRes = FSUtils::listFiles( srcDir, [ & ]( const File &file )-> bool
+    auto flistRes = FSUtils::listFiles( srcDir,
+                                        true,
+                                        [ & ]( const File &file )-> bool
     {
         auto result = ( file.type() == File::Type::Regular
                         || file.type() == File::Type::Link );
@@ -465,5 +467,50 @@ Result< bool > FSUtils::createDirecties( const std::string &path )
     }
     return result;
 }
+
+
+Result< bool > FSUtils::deleteDir( const std::string &path,
+                                   const bool force )
+{
+    auto rDirPath = Path::create( path );
+    if( ! rDirPath.value() ) {
+        auto err = R::stream( false )
+                << "Delete Director - invalid path given " << path
+                << " Error: " << path << R::fail;
+        VQ_ERROR( "Vq:Core:FS" ) << err;
+        return err;
+    }
+
+    auto rFileList = listFiles( File{ rDirPath });
+    if( ! rFileList.value() ) {
+        return R::failure( false, std::move( rFileList ));
+    }
+
+    auto &list = rFileList.data();
+    if( ! force && ! list.empty() ) {
+        auto res = R::stream( false )
+                << "Delete Directory: Cannot delete directory at "
+                << path << ", it is not empty" << R::fail;
+        VQ_ERROR( "Vq:Core:FS" ) << res;
+        return res;
+    }
+
+    auto res = R::success( true );
+    for( auto &file : list ) {
+        if( file.type() == File::Type::Dir ) {
+            //recursive
+        }
+        res = deleteFile( file );
+        if( ! res.value() ) {
+            res = R::stream( false )
+                    << "Delete Directory: Failed to delete file at "
+                    << file.path() << ". Error " << res << R::fail;
+            VQ_ERROR( "Vq:Core:FS" );
+            break;
+        }
+    }
+    return res;
+}
+
 
 }

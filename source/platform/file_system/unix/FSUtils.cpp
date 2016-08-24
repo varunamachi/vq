@@ -42,6 +42,7 @@ Result< bool > FSUtils::deleteFile( const File &file )
 
 
 static Result< bool > list( const File &dir,
+                            bool recursive,
                             FSUtils::FilterFunction filter,
                             VQ_OUT FSUtils::FileList &filesOut )
 {
@@ -74,18 +75,15 @@ static Result< bool > list( const File &dir,
         while(( dirPtr = ::readdir( dirp )) != nullptr ) {
             auto newPath = path.pathOfChild( dirPtr->d_name ).data();
             File newFile{ newPath };
-            if( newFile.type() == File::Type::Dir ) {
-                filesOut.emplace_back( std::move( newFile ));
-                auto res = list( newFile, filter, filesOut );
+            if( recursive && newFile.type() == File::Type::Dir ) {
+                auto res = list( newFile, recursive, filter, filesOut );
                 if( ! res ) {
                     //Or we could return
                     continue;
                 }
             }
-            else {
-                if( filter == nullptr || filter( newFile )) {
-                    filesOut.emplace_back( std::move( newFile ));
-                }
+            if( filter == nullptr || filter( newFile )) {
+                filesOut.emplace_back( std::move( newFile ));
             }
         }
     }
@@ -100,11 +98,12 @@ static Result< bool > list( const File &dir,
 
 Result< FSUtils::FileList > FSUtils::listFiles(
         const File &dir,
+        bool recursive,
         FSUtils::FilterFunction filter,
         FileListResultFunc resultCallback )
 {
     FileList files;
-    auto rz = list( dir, filter, files );
+    auto rz = list( dir, recursive, filter, files );
     auto result = R::success< FileList >( std::move( files ));
     if( ! rz ) {
         result = R::failure< FileList >( FileList{ }, std::move( rz ));
@@ -149,7 +148,7 @@ Result< bool > FSUtils::copyFileImpl( const File &src,
     auto result = R::success( true );
     if( progCallback == nullptr ) {
         //if progress information is not required we use the kernel mode copy
-        /* Stat the input file to obtain its size. */
+        //Stat the input file to obtain its size.
         //Open destination file, with same permission as the source
         ::off_t offset;
         auto retVal = sendfile( srcFd,
@@ -162,7 +161,6 @@ Result< bool > FSUtils::copyFileImpl( const File &src,
                      << src << " dst: "
                      << dst << R::fail;
         }
-
     }
     else {
         static const std::size_t BUFFER_SIZE = ( 32 * 1024 );
@@ -206,22 +204,20 @@ Result< bool > FSUtils::mkdirImpl( const std::string &path )
 }
 
 
-
-
-
-Result< bool > FSUtils::createSoftLink( const std::string &targetPath,
-                                        const std::string &linkPath )
+Result< bool > FSUtils::createSoftLinkImpl( const std::string &target,
+                                            const std::string &link )
 {
-    return R::failure< bool >();
+    auto res = R::success( true );
+    if( ::symlink( target.c_str(), link.c_str() ) != 0 ) {
+        res = R::stream( false, errno )
+                << "Failed to create symlink to " << target
+                << " at " << link << R::fail;
+    }
+    return res;
 }
 
 
 
-Result< bool > FSUtils::deleteDir( const std::string &path,
-                                   const bool force )
-{
-    return R::failure< bool >();
-}
 
 
 }

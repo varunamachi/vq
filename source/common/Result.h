@@ -170,6 +170,11 @@ public:
         return m_reason;
     }
 
+    const ReturnType & data() const
+    {
+        return m_data;
+    }
+
     ReturnType & data()
     {
         return m_data;

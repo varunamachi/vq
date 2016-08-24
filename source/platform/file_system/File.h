@@ -36,6 +36,8 @@ public:
 
     explicit File( const Path &path );
 
+    explicit File( Path &&path );
+
     File( File &&other );
 
     ~File();

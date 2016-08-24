@@ -29,6 +29,7 @@ Result< BundleMap > BundleLoader::loadAll( const std::string &location )
     }
     BundleMap bundleMap;
     auto files = FSUtils::listFiles( pluginDir,
+                                     true,
                                      []( const File &file ) -> bool {
         const auto &ext = file.path().extension();
         auto result = file.type() == File::Type::Regular

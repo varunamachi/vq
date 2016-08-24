@@ -51,6 +51,7 @@ public:
 
     static Result< FileList > listFiles(
             const File &dir,
+            bool recursive = true,
             FilterFunction filter = nullptr,
             FileListResultFunc resultCallback = nullptr);
 
@@ -101,6 +102,9 @@ private:
             DirCopyProgFunc progCallback );
 
     static Result< bool > mkdirImpl( const std::string &path );
+
+    static Result< bool > createSoftLinkImpl( const std::string &target,
+                                              const std::string &link );
 
 
 };

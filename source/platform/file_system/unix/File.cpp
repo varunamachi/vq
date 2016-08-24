@@ -31,6 +31,13 @@ public:
     {
     }
 
+    explicit Data( Path &&path )
+        : m_path( path.toString() )
+        , m_pathObj( std::move( path ))
+    {
+
+    }
+
     Data( Data &&other )
         : m_path( std::move( other.m_path ))
         , m_pathObj( std::move( other.m_pathObj ))
@@ -75,6 +82,13 @@ File::File()
 
 File::File( const Path &path )
     : m_data( std::make_unique< File::Data >( path ))
+{
+
+}
+
+
+File::File( Path &&path )
+    : m_data( std::make_unique< File::Data >( std::move( path )))
 {
 
 }
