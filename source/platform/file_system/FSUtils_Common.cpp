@@ -469,38 +469,27 @@ Result< bool > FSUtils::createDirecties( const std::string &path )
 }
 
 
-Result< bool > FSUtils::deleteDir( const std::string &path,
-                                   const bool force )
+static Result< bool > deleteDirImpl( const Path &path )
 {
-    auto rDirPath = Path::create( path );
-    if( ! rDirPath.value() ) {
-        auto err = R::stream( false )
-                << "Delete Director - invalid path given " << path
-                << " Error: " << path << R::fail;
-        VQ_ERROR( "Vq:Core:FS" ) << err;
-        return err;
-    }
-
-    auto rFileList = listFiles( File{ rDirPath });
+    auto rFileList = FSUtils::listFiles( File{ path });
     if( ! rFileList.value() ) {
         return R::failure( false, std::move( rFileList ));
     }
-
     auto &list = rFileList.data();
-    if( ! force && ! list.empty() ) {
-        auto res = R::stream( false )
-                << "Delete Directory: Cannot delete directory at "
-                << path << ", it is not empty" << R::fail;
-        VQ_ERROR( "Vq:Core:FS" ) << res;
-        return res;
-    }
-
     auto res = R::success( true );
     for( auto &file : list ) {
-        if( file.type() == File::Type::Dir ) {
-            //recursive
+        if( ! file.isWritable() ) {
+            res = R::stream( false )
+                    << "Delete Directory: File/Directory at "
+                    << path << " is not writable and cannot be deleted"
+                    << R::fail;
+            VQ_ERROR( "Vq:Core:FS" ) << res;
+            break;
         }
-        res = deleteFile( file );
+        if( file.type() == File::Type::Dir ) {
+            deleteDirImpl( file.path() );
+        }
+        res = FSUtils::deleteFile( file );
         if( ! res.value() ) {
             res = R::stream( false )
                     << "Delete Directory: Failed to delete file at "
@@ -510,6 +499,20 @@ Result< bool > FSUtils::deleteDir( const std::string &path,
         }
     }
     return res;
+}
+
+
+Result< bool > FSUtils::deleteDir( const std::string &path )
+{
+    auto rDirPath = Path::create( path );
+    if( ! rDirPath.value() ) {
+        auto err = R::stream( false )
+                << "Delete Director - invalid path given " << path
+                << " Error: " << path << R::fail;
+        VQ_ERROR( "Vq:Core:FS" ) << err;
+        return err;
+    }
+    return deleteDirImpl( rDirPath.data() );
 }
 
 

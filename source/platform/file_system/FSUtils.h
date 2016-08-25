@@ -86,8 +86,7 @@ public:
     static Result< bool > createSoftLink( const std::string &targetPath,
                                           const std::string &linkPath );
 
-    static Result< bool > deleteDir( const std::string &path,
-                                     const bool force );
+    static Result< bool > deleteDir( const std::string &path );
 
 private:
     static Result< bool > copyFileImpl( const File &src,
