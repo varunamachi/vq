@@ -19,7 +19,7 @@ typedef BundleWrapper ( *PluginFunc )();
 
 Result< BundleMap > BundleLoader::loadAll( const std::string &location )
 {
-    File pluginDir( Path::create( location ));
+    File pluginDir{ Path::create( location )};
     if( pluginDir.type() == File::Type::Dir ) {
         auto result = R::stream( BundleMap{ } )
                 << "The plugin load location is not a "
