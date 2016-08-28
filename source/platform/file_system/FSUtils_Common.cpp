@@ -502,6 +502,61 @@ static Result< bool > deleteDirImpl( const Path &path )
 }
 
 
+Result< bool > FSUtils::createSoftLink( const std::string &target,
+                                        const std::string &link )
+{
+    auto rTrgPath = Path::create( target );
+    if( ! rTrgPath.value() ) {
+        auto err = R::stream( false )
+                << "Invalid target path " <<  target << " given" << R::fail;
+        VQ_ERROR( "Vq:Core:FS" ) << err;
+        return err;
+    }
+
+    auto rLnkPath = Path::create( link );
+    if( ! rLnkPath.value() ) {
+        auto err = R::stream( false )
+                << "Invalid link path " << link << " given" << R::fail;
+        VQ_ERROR( "Vq:Core:FS" ) << err;
+        return err;
+    }
+
+    File trgFile{ rTrgPath.data() };
+    File lnkFile{ rLnkPath.data() };
+    File lnkParent{ lnkFile.path().parent() };
+    auto result = R::success( true );
+    if( ! trgFile.exists() ) {
+        result = R::stream( false )
+                << "Make Link: Target file " << target << " does not exist"
+                << R::fail;
+    }
+    else if( ! trgFile.isReadable() ) {
+        result = R::stream( false )
+                << "Make Link: Target file " << target << " is not accessible"
+                << R::fail;
+    }
+    else if( lnkFile.exists() ) {
+        result = R::stream( false )
+                << "Make Link: A File at link path " << link
+                << " already exists" << R::fail;
+    }
+    else if( ! ( lnkParent.type() == File::Type::Dir
+                 && lnkParent.exists()
+                 && lnkParent.isWritable() )) {
+        result = R::stream( false )
+                << "Make Link: Parent of the link path" << link
+                << " is not accessible" << R::fail;
+    }
+    if( result.value() ) {
+        result = createSoftLinkImpl( target, link );
+    }
+    else {
+        VQ_ERROR( "Vq:Core:FS" ) << result;
+    }
+    return result;
+}
+
+
 Result< bool > FSUtils::deleteDir( const std::string &path )
 {
     auto rDirPath = Path::create( path );
