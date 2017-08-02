@@ -9,3 +9,7 @@ set( PROJECT_ROOT ${VQ_ROOT} )
 #set( VQ_TEST_DIR        ${PROJECT_ROOT}/tests )
 
 include( ${PROJECT_ROOT}/cmake/cmake_lib/core.cmake)
+
+macro( vq_add_vq )
+    vq_add_module( "vq" )
+endmacro()

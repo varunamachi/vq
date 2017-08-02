@@ -1,4 +1,7 @@
 /.project
+builds/*
+build/*
+source/.vscode
 *.txt.user*
 build/*
 output/lib/*

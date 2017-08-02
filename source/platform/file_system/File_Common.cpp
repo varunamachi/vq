@@ -14,7 +14,7 @@ File::File( const std::string &path )
 
 std::ostream & operator<<( std::ostream &stream, const File &file )
 {
-    stream << file;
+    stream << file.path();
     return stream;
 }
 
