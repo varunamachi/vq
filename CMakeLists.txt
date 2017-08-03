@@ -1,4 +1,4 @@
-project( vq_all )
+project( vq )
 cmake_minimum_required(VERSION 3.1)
 cmake_policy( SET CMP0020 NEW )
 set( PROJECT_ROOT $ENV{VQ_ROOT} )

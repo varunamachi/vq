@@ -10,6 +10,6 @@ set( PROJECT_ROOT ${VQ_ROOT} )
 
 include( ${PROJECT_ROOT}/cmake/cmake_lib/core.cmake)
 
-macro( vq_add_vq )
-    vq_add_module( "vq" )
+macro( vq_add_core )
+    vq_add_module( "core" )
 endmacro()
